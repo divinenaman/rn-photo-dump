@@ -36,7 +36,7 @@ function Backdrop() {
   );
 }
 
-export default function MaskedFlatList({ data }) {
+export default function CarouselFlatList({ data }) {
   const scrollX = useRef(new Animated.Value(0)).current;
 
   return (
