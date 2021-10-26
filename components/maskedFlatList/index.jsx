@@ -8,46 +8,32 @@ import {
   Image,
   Dimensions,
 } from "react-native";
-import MaskedView  from "@react-native-community/masked-view";
 
-const IMAGE_HEIGHT = "60%";
-const IMAGE_WIDTH = 200;
-const { width } = Dimensions.get("window");
+import { LinearGradient } from "expo-linear-gradient";
 
-export default function Backdrop({ data, animatedScrollXValue }) {
-    return (
-        <View
-          style={{
-            position: "absolute",
-            width,
-            height: "100%"
-          }}
-        >
-          <FlatList
-            horizontal={true}
-            keyExtractor={(item) => item.key}
-            data={data}
-            snapToInterval={IMAGE_WIDTH + 20 + 20}
-            decelerationRate={0}
-            bounces={false}
-            onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { x: scrollX } } }],
-              { useNativeDriver: true }
-            )}
-            renderItem={({ item, index }) => {
-                return (
-                    <MaskedView>
-                        <Image source={{ uri: item.image }} style={{
-                            width,
-                            height: "100%",
-                            resizeMode: "cover"
-                        }}/>
-                    </MaskedView>
-                )
-            }}
-          />
-        </View>
-      );    
+const IMAGE_HEIGHT = 300;
+const IMAGE_WIDTH = 250;
+const SIZE = IMAGE_WIDTH + 20 + 2 * 10;
+const { width, height } = Dimensions.get("window");
+
+function Backdrop() {
+  return (
+    <View
+      style={{
+        position: "absolute",
+        width,
+        height,
+      }}
+    >
+      <LinearGradient
+        colors={["#ff0000", "#bc2525"]}
+        style={{
+          width,
+          height: "100%",
+        }}
+      />
+    </View>
+  );
 }
 
 export default function MaskedFlatList({ data }) {
@@ -59,7 +45,7 @@ export default function MaskedFlatList({ data }) {
         flex: 1,
       }}
     >
-      <Backdrop animatedScrollXValue={scrollX} data={data} />  
+      <Backdrop />
       <Animated.FlatList
         horizontal={true}
         keyExtractor={(item) => item.key}
@@ -83,7 +69,6 @@ export default function MaskedFlatList({ data }) {
 }
 
 function ListItem({ item, idx, animatedScrollXValue }) {
-  const SIZE = IMAGE_WIDTH + 2 * 20 + 2 * 10;
   const inputRange = [(idx - 2) * SIZE, (idx - 1) * SIZE, idx * SIZE];
   const outputRange = [0, -50, 0];
   const translateY = animatedScrollXValue.interpolate({
@@ -91,28 +76,40 @@ function ListItem({ item, idx, animatedScrollXValue }) {
     outputRange,
   });
 
-  if (item.key == "space-left" || item.key == "space-right") {
-    const SPACER_SIZE = (width - SIZE) / 2;
+  if (item.key == "space-left") {
+    const SPACER_SIZE = (width - SIZE - 20) / 2;
+    return <View style={{ width: SPACER_SIZE, marginRight: 20 }}></View>;
+  }
 
+  if (item.key == "space-right") {
+    const SPACER_SIZE = (width - SIZE - 20) / 2;
     return <View style={{ width: SPACER_SIZE }}></View>;
   }
 
   return (
     <Animated.View
       style={{
-        backgroundColor: "teal",
+        backgroundColor: "#eaeaea",
         marginRight: 20,
-        borderRadius: 16,
-        padding: 10,
+        borderRadius: 20,
+        paddingHorizontal: 10,
+        paddingVertical: 20,
+        elevation: 20,
         transform: [{ translateY }],
+        alignItems: "center",
+        justifyContent: "space-between",
       }}
     >
       <Animated.Image
         source={{ uri: item.image }}
         style={{ width: IMAGE_WIDTH, height: IMAGE_HEIGHT }}
       />
-      <Animated.Text>{item.name}</Animated.Text>
-      <Animated.Text>{item.desp}</Animated.Text>
+      <Animated.Text style={{ fontWeight: "bold", fontSize: 20 }}>
+        {item.name}
+      </Animated.Text>
+      <Animated.Text style={{ fontSize: 10, color: "grey" }}>
+        {item.desp}
+      </Animated.Text>
     </Animated.View>
   );
 }
